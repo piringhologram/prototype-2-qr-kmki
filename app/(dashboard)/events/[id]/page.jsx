@@ -1,5 +1,16 @@
 import Link from "next/link"
-import { notFound } from "next/navigation"
+import { notFound } from "next/navigation"  
+
+export async function generateMetadata({params}) {
+    const id = params.id
+
+    const res = await fetch('http://localhost:4000/events/' + id) 
+    const event = await res.json()
+
+    return {
+        title: `KMKI Bayern | ${event.title}`
+    }
+}
 
 async function getEvents(id) {
     const res = await fetch('http://localhost:4000/events/' + id , {
@@ -14,7 +25,8 @@ async function getEvents(id) {
     return res.json()
 }
 export default async function EventDetails({params}) {
-  const event = await getEvents(params.id)
+  
+    const event = await getEvents(params.id)
 
   return (
     <main>

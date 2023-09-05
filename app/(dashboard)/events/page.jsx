@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react'
 import Link from 'next/link'
 import EventList from './EventList'
-import Loading from '../(dashboard)/loading'
+import Loading from '../loading'
 
 export default function page() {
   return (
