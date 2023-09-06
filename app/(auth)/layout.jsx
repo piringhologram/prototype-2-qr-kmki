@@ -1,24 +1,19 @@
-import React from 'react'
-import Image from 'next/image'
-import Logo from "../components/logo-kmki-bayern.png"
-import Link from 'next/link'
+"use client"
 
+import AuthForm from '../AuthForm';
 
-export default function AuthLayout({children}) {
+export default function Login() {
+
+  const handleSubmit = async (e, email, password) => {
+    e.preventDefault()
+
+    console.log('user login', email, password)
+  }
+
   return (
-    <>
-        <nav>
-        <Image
-        src={Logo}
-        alt='Logo KMKI Bayern'
-        width={70}
-        placeholder='blur'
-        quality={100}
-        />
-        <h1>Project QR</h1>
-        <Link href= "/login">Login</Link>
-    </nav>
-    {children}
-    </>
+    <main>
+        <h2 className="text-center">Log in</h2>
+        <AuthForm handleSubmit = {handleSubmit}/>
+    </main>
   )
 }
