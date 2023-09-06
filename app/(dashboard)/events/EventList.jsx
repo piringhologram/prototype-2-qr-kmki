@@ -1,16 +1,21 @@
 import Link from "next/link"
-async function getEvents() {
+import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
+async function getEvents() {
     // //imitate delay
     // await new Promise(resolve => setTimeout(resolve, 3000))
 
-    const res = await fetch('http://localhost:4000/events', {
-        next: {
-            revalidate: 0 //use 0 to opt out using cache.
-        }
-    })
+    const supabase = createServerComponentClient({ cookies })
 
-    return res.json()
+    const { data, error } = await supabase.from('Events')
+    .select()
+
+    if (error) {
+        console.log(error.message)
+    }
+
+    return data
 }
 
 export default async function EventList() {

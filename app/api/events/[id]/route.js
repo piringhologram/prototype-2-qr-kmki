@@ -1,4 +1,6 @@
-import { NextResponse } from "next/server"
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 
 export async function GET(_, { params }) {
   const id = params.id
@@ -15,4 +17,16 @@ export async function GET(_, { params }) {
   return NextResponse.json(event, {
     status: 200
   })
+}
+
+export async function DELETE(_, { params }) {
+  const id = params.id
+
+  const supabase = createRouteHandlerClient({ cookies })
+
+  const { error } = await supabase.from('Events')
+    .delete()
+    .eq('id', id)
+
+  return NextResponse.json({ error })
 }

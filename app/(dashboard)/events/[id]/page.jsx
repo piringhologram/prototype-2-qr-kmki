@@ -1,28 +1,37 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"  
+import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+
+//components
+import DeleteButton from './DeleteButton'
 
 export async function generateMetadata({params}) {
-    const id = params.id
+    const supabase = createServerComponentClient({ cookies })
 
-    const res = await fetch('http://localhost:4000/events/' + id) 
-    const event = await res.json()
-
+    const { data: event } = await supabase.from('Events')
+    .select()
+    .eq('id', params.id)
+    .single()
+ 
     return {
-        title: `KMKI Bayern | ${event.title}`
+        title: `KMKI Bayern | ${event?.title || 'Event not Found'}`
     }
 }
 
 async function getEvents(id) {
-    const res = await fetch('http://localhost:4000/events/' + id , {
-        next: {
-            revalidate: 60
-        }
-    })
+    const supabase = createServerComponentClient({ cookies })
 
-    if (!res.ok) {
-        notFound()
+    const { data } = await supabase.from('Events')
+    .select()
+    .eq('id', id)
+    .single()
+
+    if (!data) {
+      notFound()
     }
-    return res.json()
+  
+    return data
 }
 export default async function EventDetails({params}) {
   
@@ -30,9 +39,12 @@ export default async function EventDetails({params}) {
 
   return (
     <main>
-        <div>
+        <nav className="mb-0">
           <h2>Event Details</h2>
-        </div>
+          <div className="ml-auto">
+            <DeleteButton id={event.id} />
+          </div>
+        </nav>
 
         <div key = {event.id} className="card my-5">
                 <h3>{event.title}</h3>

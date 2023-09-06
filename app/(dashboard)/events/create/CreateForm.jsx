@@ -19,17 +19,21 @@ export default function CreateForm() {
 
     const newEvent = { title, dateandtime, location, body, rsvp }
 
-    const res = await fetch('http://localhost:4000/events', {
+    const res = await fetch('http://localhost:3000/api/events', {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(newEvent)
     })
 
-    if (res.status === 201) {
+    const json = await res.json()
+
+    if (json.error) {
+      console.log(error.message)
+    }
+    if (json.data) {
       router.refresh()
       router.push('/events')
     }
-    
   }
 
   return (

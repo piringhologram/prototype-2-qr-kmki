@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server"
+import { cookies } from 'next/headers'
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 
 export const dynamic = 'force-dynamic'
 
@@ -13,17 +15,21 @@ export async function GET() {
 }
 
 export async function POST(request) {
-    const event = await request.json()
+  const event = await request.json()
   
-    const res = await fetch('http://localhost:4000/events', {
-      method: 'POST',
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(event)
+   // get supabase instance
+  const supabase = createRouteHandlerClient({ cookies })
+
+  // get current user session
+  const { data: { session } } = await supabase.auth.getSession()
+
+  // insert the data
+  const { data, error } = await supabase.from('Events')
+    .insert({
+      ...event
     })
-  
-    const newEvent = await res.json()
-  
-    return NextResponse.json(newEvent, {
-      status: 201
-    })
+    .select()
+    .single()
+
+  return NextResponse.json({ data, error })
   }

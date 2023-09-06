@@ -1,6 +1,8 @@
 import './globals.css'
 import { Montserrat } from 'next/font/google'
 
+export const dynamic = 'force-dynamic'
+
 //components
 import Navbar from './components/Navbar'
 
