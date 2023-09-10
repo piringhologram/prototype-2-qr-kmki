@@ -51,7 +51,7 @@ export default function CreateForm() {
         <span>Date and Time:</span>
         <input
           required 
-          type="text"
+          type="datetime-local" 
           onChange={(e) => setDateandtime(e.target.value)}
           value={dateandtime}
         />
