@@ -15,8 +15,6 @@ export default function page() {
           <Link href="/events/create" className="flex justify-left">
             <button className="btn-primary">+ New Event</button>
           </Link>
-
-          <button className="btn-secondary">Filters</button>
         </nav>
 
         <Suspense fallback={<Loading/>}>

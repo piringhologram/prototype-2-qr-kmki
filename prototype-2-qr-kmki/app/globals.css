@@ -100,9 +100,17 @@ form button {
 } */
 
 /* card styles */
-.card {
+.past {
 @apply 
-bg-white 
+bg-secondary
+  bg-opacity-40
+}
+.now {
+  @apply
+  bg-white
+}
+.card {
+@apply
 shadow-sm
 rounded-2xl
 py-3 px-4 my-4 
@@ -122,6 +130,9 @@ overflow-hidden;
 }
 .card p {
   @apply my-4 text-sm leading-6;
+}
+.card pre {
+  @apply mr-2 my-4 text-sm leading-6 font-sans;
 }
 
 /* pill styles */
@@ -145,3 +156,7 @@ overflow-hidden;
     absolute bottom-0 right-0 
     rounded-tl-md;
 }
+
+
+
+
