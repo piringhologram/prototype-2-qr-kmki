@@ -8,7 +8,7 @@ async function getEvents() {
 
   const supabase = createServerComponentClient({ cookies })
 
-  const { data, error } = await supabase.from('Events')
+  const { data, error } = await supabase.from('events')
   .select()
 
   if (error) {
@@ -60,6 +60,8 @@ export async function LatestEvent() {
   currentTime.setDate(currentTime.getDate() - 1)
 
   function getFirstUpcomingEvents (events) {
+    if (!events) {return null}
+
     const filtered = events.filter(a => new Date(a.dateandtime) > currentTime).
     sort((a,b) => getTimeDifference(a.dateandtime,currentTime) > getTimeDifference(b.dateandtime,currentTime) ? 1 : -1)
     return filtered.length > 0 ? filtered[0] : null;
@@ -83,7 +85,7 @@ export async function LatestEvent() {
                 </div>
 
                 <div className="flex justify-left mb-2">
-                <Link href="">
+                <Link href = {"events/" + event.id + "/qrscanner/"}>
                     <button className="btn-primary">Scan QR Code</button>
                 </Link>
                 </div>

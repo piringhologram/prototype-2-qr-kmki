@@ -24,7 +24,7 @@ export async function POST(request) {
   const { data: { session } } = await supabase.auth.getSession()
 
   // insert the data
-  const { data, error } = await supabase.from('Events')
+  const { data, error } = await supabase.from('events')
     .insert({
       ...event
     })

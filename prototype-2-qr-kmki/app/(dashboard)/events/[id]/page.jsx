@@ -9,7 +9,7 @@ import DeleteButton from './DeleteButton'
 export async function generateMetadata({params}) {
     const supabase = createServerComponentClient({ cookies })
 
-    const { data: event } = await supabase.from('Events')
+    const { data: event } = await supabase.from('events')
     .select()
     .eq('id', params.id)
     .single()
@@ -22,7 +22,7 @@ export async function generateMetadata({params}) {
 async function getEvents(id) {
     const supabase = createServerComponentClient({ cookies })
 
-    const { data } = await supabase.from('Events')
+    const { data } = await supabase.from('events')
     .select()
     .eq('id', id)
     .single()
@@ -86,7 +86,7 @@ export default async function EventDetails({params}) {
                 </div>
 
             <div className="flex justify-left mb-2">
-            <Link href="">
+            <Link href = { event.id + "/qrscanner/"}>
                 <button className="btn-primary">Scan QR Code</button>
             </Link>
             </div>

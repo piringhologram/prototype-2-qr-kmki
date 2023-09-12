@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import QRScanner from "./[id]/qrscanner/page"
 
 async function getEvents() {
     // //imitate delay
@@ -8,7 +9,7 @@ async function getEvents() {
 
     const supabase = createServerComponentClient({ cookies })
 
-    const { data, error } = await supabase.from('Events')
+    const { data, error } = await supabase.from('events')
     .select()
 
     if (error) {
@@ -78,7 +79,7 @@ export default async function EventList() {
                 </div>
 
                 <div className="flex justify-left mb-2">
-                <Link href="">
+                <Link href = {"events/" + event.id + "/qrscanner/"}>
                     <button className="btn-primary">Scan QR Code</button>
                 </Link>
                 </div>
