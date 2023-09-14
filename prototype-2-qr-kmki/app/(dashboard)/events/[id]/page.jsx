@@ -5,6 +5,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
 //components
 import DeleteButton from './DeleteButton'
+import { removeRequestMeta } from "next/dist/server/request-meta"
 
 export async function generateMetadata({params}) {
     const supabase = createServerComponentClient({ cookies })
@@ -61,10 +62,56 @@ function getDateFormat(timestamp) {
    + addZero(timestamp.getHours() - 2) + ":" + addZero(timestamp.getMinutes());
 }
 
+function isPast (event) {
+  const currentTime = new Date();
+  //definition past event : Hari H + 1
+  currentTime.setDate(currentTime.getDate() - 1)
+
+  if (new Date(event.dateandtime) < currentTime) {
+    return true;
+  } 
+  return false;
+}
+
+function checktrue(a){
+  if (a === true) {
+      return "Enabled"
+  } else {
+      return "Disabled"
+  }
+}
+
 export default async function EventDetails({params}) {
   
-    const event = await getEvents(params.id)
+  const event = await getEvents(params.id)
 
+  if (isPast(event)){
+    return (
+      <main>
+          <nav className="mb-0">
+            <h2>Event Details</h2>
+            <div className="ml-auto">
+              <DeleteButton id={event.id} />
+            </div>
+          </nav>
+  
+          <div key = {event.id} className="card past my-5">
+                  <h3>{event.title}</h3>
+                  <h4>{getDateFormat(new Date(event.dateandtime)) }</h4>
+                  <h5 className='mb-4 font-italic'>{event.location}</h5>
+  
+                  <p className=""><pre className="flex-auto overflow-auto m-auto">{event.body}</pre></p>
+  
+                  <div className={`pill ${event.rsvp}`}>
+                      RSVP {checktrue(event.rsvp)}
+                  </div>
+  
+              <div className="flex justify-left mb-2">
+              </div>
+              </div>
+      </main>
+    )
+  }
   return (
     <main>
         <nav className="mb-0">
@@ -82,7 +129,7 @@ export default async function EventDetails({params}) {
                 <p className=""><pre className="flex-auto overflow-auto m-auto">{event.body}</pre></p>
 
                 <div className={`pill ${event.rsvp}`}>
-                    RSVP {event.rsvp}
+                    RSVP {checktrue(event.rsvp)}
                 </div>
 
             <div className="flex justify-left mb-2">

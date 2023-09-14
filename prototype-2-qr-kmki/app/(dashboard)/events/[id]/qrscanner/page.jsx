@@ -26,30 +26,55 @@ export default function qrscanner({params}) {
 
         function onSuccess(result) {
             setScanResult(result);
+            
 
             // Add the scanned result to the Supabase database
             async function addToDatabase() {
                 try {
-                    const { data, error } = await supabase
-                        .from('attendance')
-                        .insert([
+
+                    //fetch the existing attendance list
+                    let { data: ls, error } = await supabase
+                    .from('events')
+                    .select('attendees_list')
+                    .eq('id', selectedEventId)
+                    .single()
+                                      
+                    if(error) {
+                        console.error('Error fetching event data:', error);
+                        return
+                    } else {
+                        console.log('Successfully fetched data' , ls);
+                    }
+
+                    // Append the user (attendees) to the existing attendance list
+                    ls.attendees_list = ls.attendees_list || []
+                    
+                    //Check if user already exists in the attendance list
+                    if (!ls.attendees_list.includes(result)) {
+                        ls.attendees_list.push(result)
+
+                        // Update the attendees_list for the event
+                        const { data: updatedEvent, updateError} = await supabase
+                            .from('events')
+                            .upsert([
                             {
-                                user_id_tmp: result, // Assuming 'result' contains the user ID
-                                event_id: selectedEventId, // Use the selected event ID
-                                attendance_timestamp: new Date().toISOString(),
-                            },
+                                id: selectedEventId,
+                                attendees_list: ls.attendees_list  
+                            }
                         ]);
 
-                    if (error) {
-                        console.error("Error adding to the database:", error);
+                        if (updateError) {
+                            console.error("Error adding to the database:", updateError);
+                        } else {
+                            console.log("Successfully added to the database:", updatedEvent);
+                        }
                     } else {
-                        console.log("Successfully added to the database:", data);
+                        console.log('User already exists in the list: ', result)
                     }
                 } catch (error) {
                     console.error("Error:", error);
                 }
             }
-
             addToDatabase();
         }
 
