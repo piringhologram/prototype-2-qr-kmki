@@ -9,7 +9,7 @@ const supabaseUrl = 'https://vtvwbvuazbfoqfozrttg.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0dndidnVhemJmb3Fmb3pydHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTM5MTQ5MzAsImV4cCI6MjAwOTQ5MDkzMH0.6LinY1SwOPtxjPBTBDtbkjPDEDQqdu_coEnAMVR-qd8'; // Replace with your API key
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-export default function qrscanner({params}) {
+export default function QrScanner({params}) {
     
     const [scanResult, setScanResult] = useState(null);
     const selectedEventId = params.id;
