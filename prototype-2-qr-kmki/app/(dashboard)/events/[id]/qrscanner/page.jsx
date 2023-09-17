@@ -85,7 +85,7 @@ export default function qrscanner({params}) {
                     if (error) {
                         console.error("Error adding to the database:", error);
                     } else {
-                        console.log("Successfully added to the database:", data);
+                        console.log('Successfully added to the database:', data)
                     }
                 } catch (error) {
                     console.error("Error:", error);

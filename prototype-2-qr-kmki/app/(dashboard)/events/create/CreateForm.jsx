@@ -73,8 +73,8 @@ export default function CreateForm() {
           onChange={(e) => setRsvp(e.target.value)}
           value={rsvp}
         >
-          <option value="true">Enable</option>
-          <option value="false">Disable</option>
+          <option value="TRUE">Enable</option>
+          <option value="FALSE">Disable</option>
         </select>
       </label>
 

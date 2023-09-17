@@ -52,7 +52,7 @@ export default async function EventList() {
     }
 
     return timestamp.getDate() + " " + month(timestamp.getMonth()) + " " + timestamp.getFullYear() + ", "
-     + addZero(timestamp.getHours() - 2) + ":" + addZero(timestamp.getMinutes());
+     + addZero(timestamp.getHours()) + ":" + addZero(timestamp.getMinutes());
   }
 
   const currentTime = new Date();
@@ -61,6 +61,14 @@ export default async function EventList() {
 
   const pastevents = events.filter(a => new Date(a.dateandtime) < currentTime)
   const upcomingevents = events.filter(a => new Date(a.dateandtime) > currentTime)
+
+  function checktrue(a){
+    if (a === true) {
+        return "Enabled"
+    } else {
+        return "Disabled"
+    }
+  }
 
   return (
     <>  
@@ -75,7 +83,7 @@ export default async function EventList() {
                 <pre >{event.body.slice(0,200)}...</pre>
 
                 <div className={`pill ${event.rsvp}`}>
-                    RSVP {event.rsvp}
+                    RSVP {checktrue(event.rsvp)}
                 </div>
 
                 <div className="flex justify-left mb-2">
@@ -98,7 +106,7 @@ export default async function EventList() {
                 <pre >{event.body.slice(0,200)}...</pre>
 
                 <div className={`pill ${event.rsvp}`}>
-                    RSVP {event.rsvp}
+                    RSVP {checktrue(event.rsvp)}
                 </div>
 
                 <div className="flex justify-left mb-2">
