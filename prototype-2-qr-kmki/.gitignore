@@ -35,3 +35,5 @@ prototype-2-qr-kmki/.env.local
 next-env.d.ts
 
 .idea
+prototype-2-qr-kmki/package-lock.json
+prototype-2-qr-kmki/package.json

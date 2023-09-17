@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
-import { createClient } from '@supabase/supabase-js'; // Import the Supabase client
+import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://vtvwbvuazbfoqfozrttg.supabase.co'; // Replace with your Supabase project URL
+const supabaseUrl = 'https://vtvwbvuazbfoqfozrttg.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0dndidnVhemJmb3Fmb3pydHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTM5MTQ5MzAsImV4cCI6MjAwOTQ5MDkzMH0.6LinY1SwOPtxjPBTBDtbkjPDEDQqdu_coEnAMVR-qd8'; // Replace with your API key
-const supabase = createClient(supabaseUrl, supabaseKey); // Create the Supabase client
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function qrscanner({params}) {
     
     const [scanResult, setScanResult] = useState(null);
-    const selectedEventId = params.id; // Replace with the logic to capture the selected event
+    const selectedEventId = params.id;
 
     useEffect(() => {
         const scanner = new Html5QrcodeScanner('reader', {
@@ -26,17 +26,59 @@ export default function qrscanner({params}) {
 
         function onSuccess(result) {
             setScanResult(result);
+            
+             // Check whether user registered for the event
+        async function checkRegistration() {
+            try {
+                const { data: existingRecord, error } = await supabase
+                    .from('rsvp_attendance')
+                    .select('id, registration, attendance')
+                    .eq('user_id', result)
+                    .eq('event_id', selectedEventId)
+                    .single();
 
-            // Add the scanned result to the Supabase database
+                if (error) {
+                    console.error("Error checking registration:", error);
+                    return;
+                }
+
+                if (existingRecord) {
+                    // If user registered, attendance -> true
+                    if (!existingRecord.attendance) {
+                        await supabase
+                            .from('rsvp_attendance')
+                            .update({ attendance: true })
+                            .eq('id', existingRecord.id);
+                        console.log("Attendance updated to true.");
+                    } else {
+                        console.log("User is already marked as attended.");
+                    }
+                } else {
+                    // If user not registered, ask confirmation to add
+                    const addAnyway = window.confirm("You are trying to add a user that is not registered for this event. Add anyway?");
+                    if (addAnyway) {
+                        await addToDatabase();
+                    } else {
+                        console.log("User not added.");
+                    }
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+            // Add scanned result to DB or handle registration
             async function addToDatabase() {
                 try {
                     const { data, error } = await supabase
-                        .from('attendance')
+                        .from('rsvp_attendance')
                         .insert([
                             {
-                                user_id_tmp: result, // Assuming 'result' contains the user ID
-                                event_id: selectedEventId, // Use the selected event ID
+                                user_id: result, // Assuming 'result' contains the user ID
+                                event_id: selectedEventId, // Selected event ID
                                 attendance_timestamp: new Date().toISOString(),
+                                attendance: true, // attendance -> true
+                                registration: false, //no registration -> false
                             },
                         ]);
 
@@ -50,7 +92,7 @@ export default function qrscanner({params}) {
                 }
             }
 
-            addToDatabase();
+            checkRegistration();
         }
 
         function onError(err) {
