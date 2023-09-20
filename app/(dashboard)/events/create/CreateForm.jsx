@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { corsHeaders } from "@/app/_shared/cors"
 
 export default function CreateForm() {
   const router = useRouter()
@@ -21,7 +22,8 @@ export default function CreateForm() {
 
     const res = await fetch('http://localhost:3000/api/events', {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: {"Content-Type": "application/json",
+                corsHeaders},
       body: JSON.stringify(newEvent)
     })
 

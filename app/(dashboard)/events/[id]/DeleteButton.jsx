@@ -1,6 +1,7 @@
 "use client"
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { corsHeaders } from '@/app/_shared/cors'
 
 // icons & UI
 import { TiDelete } from 'react-icons/ti'
@@ -13,7 +14,8 @@ export default function DeleteIcon({ id }) {
     setIsLoading(true)
     
     const res = await fetch(`http://localhost:3000/api/events/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: corsHeaders
     })
     const json = await res.json()
 
