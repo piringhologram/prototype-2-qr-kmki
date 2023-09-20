@@ -18,7 +18,7 @@ export default function DeleteIcon({ id }) {
     const json = await res.json()
 
     if (json.error) {
-      console.log(error)
+      console.log(json.error)
       setIsLoading(false)
     }
     if (!json.error) {

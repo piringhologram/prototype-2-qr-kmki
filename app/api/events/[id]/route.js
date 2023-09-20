@@ -24,7 +24,7 @@ export async function DELETE(_, { params }) {
 
   const supabase = createRouteHandlerClient({ cookies })
 
-  const { error } = await supabase.from('Events')
+  const { error } = await supabase.from('events')
     .delete()
     .eq('id', id)
 
