@@ -69,6 +69,14 @@ export async function LatestEvent() {
 
   let event = getFirstUpcomingEvents(events)
 
+  function checktrue(a){
+    if (a === true) {
+        return "Enabled"
+    } else {
+        return "Disabled"
+    }
+  }
+
   return (
 
     <>  
@@ -81,7 +89,7 @@ export async function LatestEvent() {
                 <pre >{event.body.slice(0,200)}...</pre>
 
                 <div className={`pill ${event.rsvp}`}>
-                    RSVP {event.rsvp}
+                    RSVP {checktrue(event.rsvp)}
                 </div>
 
                 <div className="flex justify-left mb-2">

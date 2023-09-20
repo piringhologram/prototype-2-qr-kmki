@@ -11,5 +11,5 @@ export async function GET(request) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  return NextResponse.redirect(url.origin)
+  return NextResponse.redirect('https://prototype-2-qr-kmki.vercel.app/login')
 }
