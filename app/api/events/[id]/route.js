@@ -31,7 +31,6 @@ export async function DELETE(_, { params }) {
   const { error } = await supabase.from('Events')
     .delete()
     .eq('id', id)
-    .headers(corsHeaders)
 
   return NextResponse.json({ error })
 }
