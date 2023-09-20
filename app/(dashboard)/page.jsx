@@ -72,7 +72,7 @@ export async function LatestEvent() {
   return (
 
     <>  
-            {events.length != 0 && (<div key = {event.id} className="card now my-5">
+            {event != null && (<div key = {event.id} className="card now my-5">
                 <Link href= {`events/${event.id}`}>
                 <h3>{event.title}</h3>
                 <h4>{getDateFormat(new Date(event.dateandtime)) }</h4>
@@ -92,8 +92,8 @@ export async function LatestEvent() {
             </Link>
             </div>)}
         
-        {events.length === 0 && (
-            <p className="text-center">There are no events.</p>
+        {event === null && (
+            <p className="text-center">There are no upcoming events.</p>
         )}
     </>
   )
