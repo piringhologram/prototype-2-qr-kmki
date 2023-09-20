@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server"
 import { cookies } from 'next/headers'
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { corsHeaders } from "@/app/_shared/cors"
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const res = await fetch('http://localhost:4000/events')
+  const res = await fetch('http://localhost:4000/events', {
+    headers: corsHeaders
+  })
 
   const events = await res.json()
 
@@ -30,6 +33,7 @@ export async function POST(request) {
     })
     .select()
     .single()
+    .headers(corsHeaders)
 
   return NextResponse.json({ data, error })
   }

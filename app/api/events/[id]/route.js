@@ -1,11 +1,15 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { corsHeaders } from '@/app/_shared/cors'
 
 export async function GET(_, { params }) {
   const id = params.id
 
-  const res = await fetch(`http://localhost:4000/events/${id}`)
+  const res = await fetch(`http://localhost:4000/events/${id}`, {
+    headers: corsHeaders
+  })
+
   const event = await res.json()
 
   if (!res.ok) {
@@ -27,6 +31,7 @@ export async function DELETE(_, { params }) {
   const { error } = await supabase.from('Events')
     .delete()
     .eq('id', id)
+    .headers(corsHeaders)
 
   return NextResponse.json({ error })
 }
