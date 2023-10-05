@@ -14,11 +14,13 @@ export default function Signup() {
         e.preventDefault()
     
         const supabase = createClientComponentClient()
+
+
         const { error } = await supabase.auth.signUp ({
             email,
             password,
             options: {
-                emailRedirectTo: `${location.origin}/api/auth/callback`
+                emailRedirectTo: `${window.location.origin}/api/auth/callback`
             }
         })
 
