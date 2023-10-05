@@ -5,8 +5,8 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  //const res = await fetch('http://localhost:4000/events')
-  const res = await fetch('https://prototype-2-qr-kmki.vercel.app/api/events')
+  const res = await fetch('/events')
+  //const res = await fetch('https://prototype-2-qr-kmki.vercel.app/api/events')
 
   const events = await res.json()
 
