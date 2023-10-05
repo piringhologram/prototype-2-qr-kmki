@@ -6,7 +6,6 @@ export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const res = await fetch('/events')
-  //const res = await fetch('https://prototype-2-qr-kmki.vercel.app/api/events')
 
   const events = await res.json()
 

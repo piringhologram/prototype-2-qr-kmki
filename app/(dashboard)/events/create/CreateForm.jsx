@@ -19,7 +19,7 @@ export default function CreateForm() {
 
     const newEvent = { title, dateandtime, location, body, rsvp }
 
-    const res = await fetch('http://localhost:3000/api/events', {
+    const res = await fetch('/api/events', {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(newEvent)

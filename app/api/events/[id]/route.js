@@ -6,7 +6,6 @@ export async function GET(_, { params }) {
   const id = params.id
 
   const res = await fetch(`/events/${id}`)
-  //const res = await fetch(`https://prototype-2-qr-kmki.vercel.app/api/${id}`)
   
   const event = await res.json()
 

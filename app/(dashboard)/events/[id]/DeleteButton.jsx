@@ -12,7 +12,7 @@ export default function DeleteIcon({ id }) {
   const handleClick = async () => {
     setIsLoading(true)
     
-    const res = await fetch(`http://localhost:3000/api/events/${id}`, {
+    const res = await fetch(`/api/events/${id}`, {
       method: 'DELETE'
     })
     const json = await res.json()
