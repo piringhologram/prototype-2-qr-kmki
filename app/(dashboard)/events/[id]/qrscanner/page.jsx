@@ -12,14 +12,11 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export default function QrScanner({params}) {
     
     const [scanResult, setScanResult] = useState(null);
+    const [scannedUser, setScannedUser] =  useState(null);
     const selectedEventId = params.id;
 
     useEffect(() => {
         const scanner = new Html5QrcodeScanner('reader', {
-            qrbox: {
-                width: 1000,
-                height: 1000,
-            },
             fps: 25,
         });
 
@@ -30,53 +27,72 @@ export default function QrScanner({params}) {
 
         async function addToDatabase() {
             try {
-                // Check if user already register / attends an event
-                const {data : record, error } = await supabase
-                    .from('rsvp_attendance')
-                    .select('id, registration, attendance')
-                    .eq('user_id', result)
-                    .eq('event_id', selectedEventId)
+                // Check if scanned QR Code contains valid UID
+                const {data : uid, error_id } = await supabase
+                    .from('user_sensus')
+                    .select('vorname, nachname')
+                    .eq('uniqueID', result)
                     .single();
-                if (error) {
-                    console.log ("User doesn't exists in DB, adding user to DB", error)
-                }
-
-                if (record) {
-                    // there is existing data in DB
-
-                    // 1. Case : user has registered (for rsvp events), and wants to set the attendance to true.
-
-                    // 2. Case QR has already scanned. (to avoid double scanning)
-                    if (record.attendance) {
-                        console.log ("User has been scanned !")
-                    } else {
-                        // Set attendance to true, user has now attend the event.
-                        await supabase
-                            .from('rsvp_attendance')
-                            .update({ attendance: true })
-                            .eq('id', record.id);
-                        console.log("Attendance updated to true.");
-                    }
+                if (error_id) {
+                    setScannedUser("USER NOT FOUND")
+                    console.log ("invalid user !", error_id)
                 } else {
-                    // No existing data in DB (user hasn't register / no rsvp / the qr hasn't been scanned for this event)
-                    const { data, error } = await supabase
+                    console.log ("valid user", uid)
+                    
+                    // Check if user already register / attends an event
+                        const {data : record, error } = await supabase
                         .from('rsvp_attendance')
-                        .insert([
-                        {
-                            user_id: result, // Assuming 'result' contains the user ID
-                            event_id: selectedEventId, // Selected event ID
-                            attendance_timestamp: new Date().toISOString(),
-                            attendance: true, // attendance -> true
-                        },
-                         ]);
+                        .select('id, registration, attendance')
+                        .eq('user_id', result)
+                        .eq('event_id', selectedEventId)
+                        .single();
                     if (error) {
-                        console.error("Error adding to the database:", error);
+                        console.log ("User doesn't exists in DB, adding user to DB", error)
+                    }
+
+                    if (record) {
+                        // there is existing data in DB
+
+                        // 1. Case : user has registered (for rsvp events), and wants to set the attendance to true.
+
+                        // 2. Case QR has already scanned. (to avoid double scanning)
+                        if (record.attendance) {
+                            console.log ("User has been scanned !")
+                            setScannedUser(`${uid.vorname} ${uid.nachname} has been scanned!`);
+                        } else {
+                            // Set attendance to true, user has now attend the event.
+                            await supabase
+                                .from('rsvp_attendance')
+                                .update({ attendance: true })
+                                .eq('id', record.id);
+                            console.log("Attendance updated to true.");
+                            setScannedUser(`Welcome, ${uid.vorname} ${uid.nachname}!`);
+                        }
                     } else {
-                        console.log('Successfully added to the database:', data)
+                        // No existing data in DB (user hasn't register / no rsvp / the qr hasn't been scanned for this event)
+                        const { data, error } = await supabase
+                            .from('rsvp_attendance')
+                            .insert([
+                            {
+                                user_id: result, // Assuming 'result' contains the user ID
+                                event_id: selectedEventId, // Selected event ID
+                                attendance_timestamp: new Date().toISOString(),
+                                attendance: true, // attendance -> true
+                            },
+                            ]);
+                        if (error) {
+                            console.error("Error adding to the database:", error);
+                        } else {
+                            console.log('Successfully added to the database:', data)
+                            setScannedUser(`Welcome, ${uid.vorname} ${uid.nachname}!`);
+                        }
                     }
                 }
+
+
             }
             catch (error) {
+                setScannedUser("Error : User not found. Is this a valid QR Code ?")
                 console.log ("Failed to add user.", error)
             }
         }
@@ -162,14 +178,22 @@ export default function QrScanner({params}) {
 
     return (
         <div className="App">
-            <h1 style={{ textAlign: "center" }}>Scanning QR Code...</h1>
+            {scannedUser ? (
+                <h2 className="mt-4 mb-4 text-center">
+                    <a>{scannedUser}</a>
+                </h2>
+            ) : (
+                <h1 className="text-center mb-4">Scanning QR Code...</h1>
+            )}
             {scanResult ? (
                 <div style={{ textAlign: "center" }}>
-                    Success: <a href={"http://" + scanResult}>{scanResult}</a>
+                    Data: <a href={"http://" + scanResult}>{scanResult}</a>
                 </div>
             ) : (
-                <div id="reader" style={{ width: "500px", height: "500px", margin: "0 auto" }}></div>
+                <div id="reader" className="grow-0 card object-center" ></div>
+                //style={{ width: "600px", height: "500px", margin: "0 auto" }}
             )}
+            
         </div>
     );
 }

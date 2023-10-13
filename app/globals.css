@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+#reader {
+  max-width: 800px; /* Adjust the value to your desired maximum width */
+  max-height: 1800px; /* Adjust the value to your desired maximum height */
+  margin: 0 auto; /* Center horizontally */
+
+  justify-content: center; /* Center horizontally with flex */
+  align-items: center; /* Center vertically with flex */
+}
+
 /* base styles */
 body {
   background: #f6f6f6;
@@ -29,7 +38,7 @@ nav {
     border-b-2 border-gray-400
     flex items-center gap-5 
     my-10 mx-auto 
-    max-w-5xl;
+    max-w-5xl
 }
 nav a, nav span {
   @apply text-gray-600;
