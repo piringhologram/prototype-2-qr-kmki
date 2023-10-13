@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { createClient } from '@supabase/supabase-js';
 import { Coming_Soon } from "next/font/google";
+import { data } from "autoprefixer";
 
 const supabaseUrl = 'https://vtvwbvuazbfoqfozrttg.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0dndidnVhemJmb3Fmb3pydHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTM5MTQ5MzAsImV4cCI6MjAwOTQ5MDkzMH0.6LinY1SwOPtxjPBTBDtbkjPDEDQqdu_coEnAMVR-qd8'; // Replace with your API key
@@ -33,8 +34,8 @@ export default function QrScanner({params}) {
                     .select('vorname, nachname')
                     .eq('uniqueID', result)
                     .single();
-                if (error_id) {
-                    setScannedUser("USER NOT FOUND")
+                if (error_id || uid == null) {
+                    setScannedUser("Error: User not found ! Is this a valid QR Code ?")
                     console.log ("invalid user !", error_id)
                 } else {
                     console.log ("valid user", uid)
@@ -88,11 +89,9 @@ export default function QrScanner({params}) {
                         }
                     }
                 }
-
-
             }
             catch (error) {
-                setScannedUser("Error : User not found. Is this a valid QR Code ?")
+                setScannedUser("Error: Invalid QR Code!")
                 console.log ("Failed to add user.", error)
             }
         }
@@ -186,7 +185,7 @@ export default function QrScanner({params}) {
                 <h1 className="text-center mb-4">Scanning QR Code...</h1>
             )}
             {scanResult ? (
-                <div style={{ textAlign: "center" }}>
+                <div id="reader" className="grow-0 card object-center">
                     Data: <a href={"http://" + scanResult}>{scanResult}</a>
                 </div>
             ) : (
