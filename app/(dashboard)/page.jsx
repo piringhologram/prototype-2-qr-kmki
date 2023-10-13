@@ -52,7 +52,7 @@ export async function LatestEvent() {
     }
 
     return timestamp.getDate() + " " + month(timestamp.getMonth()) + " " + timestamp.getFullYear() + ", "
-    + addZero(timestamp.getHours() - 2) + ":" + addZero(timestamp.getMinutes());
+    + addZero(timestamp.getHours()) + ":" + addZero(timestamp.getMinutes());
   }
 
   const currentTime = new Date();
