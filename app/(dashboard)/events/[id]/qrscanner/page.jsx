@@ -21,8 +21,9 @@ export default function QrScanner({params}) {
         const scanner = new Html5QrcodeScanner('reader', {
             fps: 25,
         });
-
-        scanner.render(onSuccess, onError);
+        if (scanning){
+            scanner.render(onSuccess, onError);
+        }
 
         async function onSuccess(result) {
             if (scanning) {
