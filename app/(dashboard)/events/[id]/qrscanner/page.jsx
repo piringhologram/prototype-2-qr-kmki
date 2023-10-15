@@ -20,7 +20,7 @@ export default function QrScanner({params}) {
         const scanner = new Html5QrcodeScanner('reader', {
             fps: 25,
         });
-        while (!isLoading){
+        if (!isLoading){
             scanner.render(onSuccess, onError);
         }
 
