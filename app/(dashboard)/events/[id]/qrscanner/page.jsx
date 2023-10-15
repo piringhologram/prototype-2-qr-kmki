@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { createClient } from '@supabase/supabase-js';
-import { Coming_Soon } from "next/font/google";
-import { data } from "autoprefixer";
+import { Asap_Condensed } from "next/font/google";
 
 const supabaseUrl = 'https://vtvwbvuazbfoqfozrttg.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0dndidnVhemJmb3Fmb3pydHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTM5MTQ5MzAsImV4cCI6MjAwOTQ5MDkzMH0.6LinY1SwOPtxjPBTBDtbkjPDEDQqdu_coEnAMVR-qd8'; // Replace with your API key
@@ -14,21 +13,21 @@ export default function QrScanner({params}) {
     
     const [scanResult, setScanResult] = useState(null);
     const [scannedUser, setScannedUser] =  useState(null);
-    const [scanning, setScanning] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const selectedEventId = params.id;
 
     useEffect(() => {
         const scanner = new Html5QrcodeScanner('reader', {
             fps: 25,
         });
-        if (scanning){
+        while (!isLoading){
             scanner.render(onSuccess, onError);
         }
 
         async function onSuccess(result) {
-            if (scanning) {
+            if (!isLoading) {
                 setScanResult(result);
-                setScanning(false)
+                setIsLoading(true)
 
                 try {
                     // Check if scanned QR Code contains valid UID
@@ -104,7 +103,7 @@ export default function QrScanner({params}) {
                     console.log ("Failed to add user.", error)
                 }
                 finally {
-                    setScanning(true)
+                    setIsLoading(false)
                 }
             }
         }
