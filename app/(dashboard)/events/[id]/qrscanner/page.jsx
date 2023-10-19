@@ -69,7 +69,7 @@ export default function QrScanner({params}) {
                         }
                     } else {
                         // Error handling
-                        setScannedUser(`Error: Data ${res.statusText}. Is this a valid QR Code?`)
+                        setScannedUser(`Error: Data not found. Is this a valid QR Code?`)
                         //console.log('Error:', res.statusText)
                     }
                 } catch (error) {
