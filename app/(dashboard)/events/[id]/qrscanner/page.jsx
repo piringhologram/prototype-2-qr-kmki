@@ -118,8 +118,7 @@ export default function QrScanner({params}) {
             ) : (
                 <h1 className="text-center mb-4">Scanning QR Code...</h1>
             )}
-            {/* {isLoading && <span>Loading...</span>}
-            {!isLoading && <span>Not Loading</span>} */}
+            {/* {isLoading && <span>Loading...</span>}*/}
             {scanResult ? (
                 <div id="reader" className="grow-0 card object-center text-center">
                     Data: <a>{scanResult}</a>
