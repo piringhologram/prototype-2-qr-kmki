@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { createClient } from '@supabase/supabase-js';
 import { Asap_Condensed } from "next/font/google";
@@ -14,178 +14,101 @@ export default function QrScanner({params}) {
     const [scanResult, setScanResult] = useState(null);
     const [scannedUser, setScannedUser] =  useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [newQuery, setNewQuery] = useState(false)
     const selectedEventId = params.id;
 
+    // Setting up the scanner, happens only once so that no repeated camera access request required
     useEffect(() => {
         const scanner = new Html5QrcodeScanner('reader', {
             fps: 25,
         });
-        if (!isLoading){
-            scanner.render(onSuccess, onError);
-        }
 
-        async function onSuccess(result) {
-            if (!isLoading) {
-                setScanResult(result);
-                setIsLoading(true)
-
-                try {
-                    // Check if scanned QR Code contains valid UID
-                    const {data : uid, error_id } = await supabase
-                        .from('user_sensus')
-                        .select('vorname, nachname')
-                        .eq('uniqueID', result)
-                        .single();
-                    if (error_id || uid == null) {
-                        setScannedUser("Error: User not found ! Is this a valid QR Code ?")
-                        console.log ("invalid user !", error_id)
-                    } else {
-                        console.log ("valid user", uid)
-                        
-                        // Check if user already register / attends an event
-                        const {data : record, error } = await supabase
-                            .from('rsvp_attendance')
-                            .select('id, registration, attendance')
-                            .eq('user_id', result)
-                            .eq('event_id', selectedEventId)
-                        if (error) {
-                            console.log ("Error occured when querying the database", error)
-                        } else {
-                            if (record.length === 0) {
-                                console.log ("User doesn't exists in DB, adding user to DB")
-
-                                // No existing data in DB (user hasn't register / no rsvp / the qr hasn't been scanned for this event)
-                                const { data, error } = await supabase
-                                .from('rsvp_attendance')
-                                .insert([
-                                {
-                                    user_id: result, // Assuming 'result' contains the user ID
-                                    event_id: selectedEventId, // Selected event ID
-                                    attendance_timestamp: new Date().toISOString(),
-                                    attendance: true, // attendance -> true
-                                },
-                                ]);
-                            if (error) {
-                                console.error("Error adding to the database:", error);
-                            } else {
-                                console.log('Successfully added to the database:', data)
-                                setScannedUser(`Welcome, ${uid.vorname} ${uid.nachname}!`);
-                            }
-                            } else if (record.length === 1) {
-                                const record_single = record[0]
-                                // there is existing data in DB
-
-                                // 1. Case : user has registered (for rsvp events), and wants to set the attendance to true.
-
-                                // 2. Case QR has already scanned. (to avoid double scanning)
-                                if (record_single.attendance) {
-                                    console.log ("User has been scanned !")
-                                    setScannedUser(`${uid.vorname} ${uid.nachname} has been scanned!`);
-                                } else {
-                                    // Set attendance to true, user has now attend the event.
-                                    await supabase
-                                        .from('rsvp_attendance')
-                                        .update({ attendance: true })
-                                        .eq('id', record_single.id);
-                                    console.log("Attendance updated to true.");
-                                    setScannedUser(`Welcome, ${uid.vorname} ${uid.nachname}!`);
-                                }
-                            } else {
-                                //multiple records found
-                                console.log("Error : Multiple data found")
-                                setScannedUser("Error: Multiple data in DB")
-                            }
-                        }
-                    }
-                }
-                catch (error) {
-                    setScannedUser("Error: Invalid QR Code!")
-                    console.log ("Failed to add user.", error)
-                }
-                finally {
-                    setIsLoading(false)
-                }
-            }
-        }
-
-        // // Check whether user registered for the event
-        // async function checkRegistration() {
-        //     try {
-        //         const { data: existingRecord, error } = await supabase
-        //             .from('rsvp_attendance')
-        //             .select('id, registration, attendance')
-        //             .eq('user_id', result)
-        //             .eq('event_id', selectedEventId)
-        //             .single();
-
-        //         if (error) {
-        //             console.error("Error checking registration:", error);
-        //             return;
-        //         }
-
-        //         if (existingRecord) {
-        //             // If user registered, attendance -> true
-        //             if (!existingRecord.attendance) {
-        //                 await supabase
-        //                     .from('rsvp_attendance')
-        //                     .update({ attendance: true })
-        //                     .eq('id', existingRecord.id);
-        //                 console.log("Attendance updated to true.");
-        //             } else {
-        //                 console.log("User is already marked as attended.");
-        //             }
-        //         } else {
-        //             // If user not registered, ask confirmation to add
-        //             const addAnyway = window.confirm("You are trying to add a user that is not registered for this event. Add anyway?");
-        //             if (addAnyway) {
-        //                 await addToDatabase();
-        //             } else {
-        //                 console.log("User not added.");
-        //             }
-        //         }
-        //     } catch (error) {
-        //         console.error("Error:", error);
-        //     }
-        // }
-
-        //     // Add scanned result to DB or handle registration
-        //     async function addToDatabase() {
-        //         try {
-        //             const { data, error } = await supabase
-        //                 .from('rsvp_attendance')
-        //                 .insert([
-        //                     {
-        //                         user_id: result, // Assuming 'result' contains the user ID
-        //                         event_id: selectedEventId, // Selected event ID
-        //                         attendance_timestamp: new Date().toISOString(),
-        //                         attendance: true, // attendance -> true
-        //                         registration: false, //no registration -> false
-        //                     },
-        //                 ]);
-
-        //             if (error) {
-        //                 console.error("Error adding to the database:", error);
-        //             } else {
-        //                 console.log('Successfully added to the database:', data)
-        //             }
-        //         } catch (error) {
-        //             console.error("Error:", error);
-        //         }
-        //     }
-
-            //checkRegistration();
-
-        function onError(err) {
-            //console.warn(err);
-            setScanning(true)
-        }
+        scanner.render(onSuccess, onError)
 
         return () => {
             // Clean up the scanner when the component unmounts
             scanner.clear();
         };
-    }, [selectedEventId]); // Include selectedEventId in the dependency array
+    }, [selectedEventId]);
 
+    // Handle the UID submission process, behaviour changes whenever isLoading changes.
+    // isLoading true : don't process the data
+    // isLoading false : process the data
+    useEffect(() => {     
+        if (!isLoading && newQuery) {           
+            async function handleData(data) {
+                setIsLoading(true)
+                //console.log(`isloading : ${isLoading}`)
+                // Assuming data is a string you want to pass as a query parameter
+                const apiUrl = `/api/events/${selectedEventId}/qrscanner?input=${encodeURIComponent(data)}`;
+                
+                try {
+                    const res = await fetch(apiUrl, {
+                        method: "GET",
+                    });
+        
+                    if(res.status === 200){
+                        const response = await res.json();
+                        //setScannedUser(response)
+                        console.log(response)
+
+                        const apiUrl = `/api/events/${selectedEventId}/qrscanner?input=${encodeURIComponent(data)}&eventid=${selectedEventId}`;
+                        const res2 = await fetch(apiUrl, {
+                            method: "POST",
+                        });
+                        const response2 = await res2.json();
+
+                        if(res2.status === 201 || res2.status === 202){
+                            // erfolgreich
+                            setScannedUser(response2)
+                            console.log(response2)
+                        } else{
+                            // Error handling.
+                            setScannedUser(response2)
+                            console.log('Error:', response2)
+                        }
+                    } else {
+                        // Error handling
+                        setScannedUser(`Error: Data ${res.statusText}. Is this a valid QR Code?`)
+                        //console.log('Error:', res.statusText)
+                    }
+                } catch (error) {
+                    console.log('Error:', error);
+                } finally {
+                    //console.log(`di sblm finally: ${isLoading}`)
+                    setIsLoading(false)
+                    //scanner.resume
+                }
+                    
+                
+                //console.log(`isLoading setelah processing : ${isLoading}`)
+                //setIsLoading(false);
+            }
+            handleData(scanResult)
+        } else {
+            console.log("Data is not processed.")
+        }
+
+        setNewQuery(false)
+
+    }, [isLoading, selectedEventId, newQuery]); // Include selectedEventId in the dependency array
+
+    function onSuccess(data) {
+        // if isLoading = true, don't process data. just leave it.
+        if (isLoading){
+            console.log("data not processed, still loading.")
+            return;
+        }
+        
+        setScanResult(data)       
+        setNewQuery(true)        
+    }
+
+    function onError(error){
+        if (isLoading) {
+            return;
+        }
+    }
     return (
         <div className="App">
             {scannedUser ? (
@@ -195,6 +118,8 @@ export default function QrScanner({params}) {
             ) : (
                 <h1 className="text-center mb-4">Scanning QR Code...</h1>
             )}
+            {/* {isLoading && <span>Loading...</span>}
+            {!isLoading && <span>Not Loading</span>} */}
             {scanResult ? (
                 <div id="reader" className="grow-0 card object-center text-center">
                     Data: <a>{scanResult}</a>
