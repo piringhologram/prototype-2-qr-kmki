@@ -37,6 +37,7 @@ export async function GET(request) {
 }
 
 
+
 export async function POST(request){
     const { searchParams } = new URL(request.url);
     const input = searchParams.get('input');
