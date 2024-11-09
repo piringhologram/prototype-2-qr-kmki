@@ -14,7 +14,7 @@ export async function GET(request) {
     try {
         // Check if scanned QR Code contains a valid UID
         const { data: uid, error } = await supabase
-            .from('user_sensus')
+            .from('user_sensus_2024')
             .select('vorname, nachname')
             .eq('uniqueID', input)
             .single();
@@ -45,7 +45,7 @@ export async function POST(request){
     const supabase = createRouteHandlerClient({ cookies });
     
     const { data: uid, error2 } = await supabase
-    .from('user_sensus')
+    .from('user_sensus_2024')
     .select('vorname, nachname')
     .eq('uniqueID', input)
     .single();
