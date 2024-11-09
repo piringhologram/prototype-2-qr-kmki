@@ -6,8 +6,6 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const input = searchParams.get('input');
 
-    //console.log("masuk sini bos", input)
-
     const supabase = createRouteHandlerClient({ cookies });
     //console.log(input);
 
@@ -29,7 +27,7 @@ export async function GET(request) {
             })
         }
     } catch (error) {
-        //console.error("Error occurred:", error);
+        console.error("Error occurred:", error);
         return NextResponse.json(error, {
             status: 500
         })
@@ -58,13 +56,13 @@ export async function POST(request){
         .eq('user_id', input)
         .eq('event_id', eventid)
     if (error) {
-        //console.log ("Error occured when querying the database", error)
+        console.log ("Error occured when querying the database", error)
         return NextResponse.json(error, {
             status: 500
         })
     } else {
         if (record.length === 0) {
-        //console.log ("User doesn't exists in DB, adding user to DB")
+        console.log ("User doesn't exists in DB, adding user to DB")
 
         // No existing data in DB (user hasn't register / no rsvp / the qr hasn't been scanned for this event)
         const { data, error } = await supabase
@@ -78,12 +76,12 @@ export async function POST(request){
         },
         ]);
     if (error) {
-        //console.error("Error adding to the database:", error);
+        console.error("Error adding to the database:", error);
         return NextResponse.json(error, {
             status: 500
         })
     } else {
-        //console.log('Successfully added to the database:', data)
+        console.log('Successfully added to the database:', data)
         return NextResponse.json(`Welcome, ${uid.vorname} ${uid.nachname}!`, {
             status: 201
         })
