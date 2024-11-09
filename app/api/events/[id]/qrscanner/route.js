@@ -29,7 +29,7 @@ export async function GET(request) {
             })
         }
     } catch (error) {
-        //console.error("Error occurred:", error);
+        console.error("Error occurred:", error);
         return NextResponse.json(error, {
             status: 500
         })
@@ -58,7 +58,7 @@ export async function POST(request){
         .eq('user_id', input)
         .eq('event_id', eventid)
     if (error) {
-        //console.log ("Error occured when querying the database", error)
+        console.log ("Error occured when querying the database", error)
         return NextResponse.json(error, {
             status: 500
         })
@@ -78,7 +78,7 @@ export async function POST(request){
         },
         ]);
     if (error) {
-        //console.error("Error adding to the database:", error);
+        console.error("Error adding to the database:", error);
         return NextResponse.json(error, {
             status: 500
         })
