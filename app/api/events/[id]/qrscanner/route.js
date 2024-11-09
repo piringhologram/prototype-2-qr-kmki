@@ -53,7 +53,7 @@ export async function POST(request){
 
     // Check if user already register / attends an event
     const {data : record, error } = await supabase
-        .from('rsvp_attendance')
+        .from('rsvp_attendance_2024')
         .select('id, registration, attendance')
         .eq('user_id', input)
         .eq('event_id', eventid)
@@ -68,7 +68,7 @@ export async function POST(request){
 
         // No existing data in DB (user hasn't register / no rsvp / the qr hasn't been scanned for this event)
         const { data, error } = await supabase
-        .from('rsvp_attendance')
+        .from('rsvp_attendance_2024')
         .insert([
         {
             user_id: input, // Assuming 'result' contains the user ID
@@ -104,7 +104,7 @@ export async function POST(request){
         } else {
             // Set attendance to true, user has now attend the event.
             await supabase
-                .from('rsvp_attendance')
+                .from('rsvp_attendance_2024')
                 .update({ attendance: true })
                 .eq('id', record_single.id);
             //console.log("Attendance updated to true.");
